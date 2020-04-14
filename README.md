@@ -1,7 +1,8 @@
 # Azure Kinect for Unity
 
 ## Examples
-SimpleVisualizer  
+SimpleVisualizer
+
 <img src="./Assets/AzureKinect4Unity/Images/AzureKinect4Unity_SimpleVisualizer.png" width="60%">
 
 ## Tested environment
@@ -19,7 +20,8 @@ https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md
 2.2. Download and import NuGetForUnity (NuGetForUnity.2.0.0.unitypackage)  
 https://github.com/GlitchEnzo/NuGetForUnity/releases/tag/v2.0.0
 
-2.3. Install Microsoft.Azure.Kinect.Sensor package  
+2.3. Install Microsoft.Azure.Kinect.Sensor package
+
 <img src="./Assets/AzureKinect4Unity/Images/AzureKinect4Unity_NuGet.png" width="60%">
 
 2.4. Copy dll files from the SDK folder  
@@ -28,11 +30,13 @@ Copy "depthengine_2_0.dll" and "k4a.dll" from the SDK installation folder to Plu
 SDK installation folder  
 C:\Program Files\Azure Kinect SDK v1.4.0\sdk\windows-desktop\amd64\release\bin
 
-Plugins folder  
+Plugins folder
+
 <img src="./Assets/AzureKinect4Unity/Images/AzureKinect4Unity_DLL.png">
 
 2.5. Import AzureKinect4Unity
 
+<img src="./Assets/AzureKinect4Unity/Images/AzureKinect4Unity_ImportPackage.png" width="60%">
 
 ## Third party assets
 このプロジェクトには、以下のアセットが含まれています。  
