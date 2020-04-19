@@ -36,6 +36,9 @@ namespace AzureKinect4Unity
         private ushort[] _TransformedDepthImage = null;
         public ushort[] TransformedDepthImage { get { return _TransformedDepthImage; } }
 
+        private Short3[] _PointCloud = null;
+        public Short3[] PointCloud { get { return _PointCloud; } }
+
         public void OpenSensor(int deviceIndex = 0)
         {
             _KinectSensor = Device.Open(deviceIndex);
@@ -73,11 +76,6 @@ namespace AzureKinect4Unity
             CameraCalibration depthCamera = _DeviceCalibration.DepthCameraCalibration;
             _DepthImageWidth = depthCamera.ResolutionWidth;
             _DepthImageHeight = depthCamera.ResolutionHeight;
-
-            _RawColorImage = new byte[_ColorImageWidth * _ColorImageHeight * 4];
-            _TransformedColorImage = new byte[_DepthImageWidth * _DepthImageHeight * 4];
-            _RawDepthImage = new ushort[_DepthImageWidth * _DepthImageHeight];
-            _TransformedDepthImage = new ushort[_ColorImageWidth * _ColorImageHeight];
         }
 
         public void CloseSensor()
@@ -108,6 +106,7 @@ namespace AzureKinect4Unity
                 {
                     _RawDepthImage = capture.Depth.GetPixels<ushort>().ToArray();
                     _TransformedDepthImage = _Transformation.DepthImageToColorCamera(capture).GetPixels<ushort>().ToArray();
+                    _PointCloud = _Transformation.DepthImageToPointCloud(capture.Depth).GetPixels<Short3>().ToArray();
                 }
 
                 capture.Dispose();
