@@ -104,9 +104,14 @@ namespace AzureKinect4Unity
 
                 if (capture.Depth != null)
                 {
-                    _RawDepthImage = capture.Depth.GetPixels<ushort>().ToArray();
-                    _TransformedDepthImage = _Transformation.DepthImageToColorCamera(capture).GetPixels<ushort>().ToArray();
-                    _PointCloud = _Transformation.DepthImageToPointCloud(capture.Depth).GetPixels<Short3>().ToArray();
+                    Image depthImage = capture.Depth;
+                    Image transformedDepthImage = _Transformation.DepthImageToColorCamera(capture);
+
+                    _RawDepthImage = depthImage.GetPixels<ushort>().ToArray();
+                    _TransformedDepthImage = transformedDepthImage.GetPixels<ushort>().ToArray();
+
+                    _PointCloud = _Transformation.DepthImageToPointCloud(transformedDepthImage, CalibrationDeviceType.Color)
+                                                 .GetPixels<Short3>().ToArray();
                 }
 
                 capture.Dispose();

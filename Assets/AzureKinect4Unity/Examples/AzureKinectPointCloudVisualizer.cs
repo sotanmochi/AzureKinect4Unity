@@ -11,7 +11,7 @@ namespace AzureKinect4Unity
         AzureKinectSensor _KinectSensor;
 
         PointCloudRenderer _PointCloudRenderer;
-        Texture2D _TransformedColorImageTexture;
+        Texture2D _ColorImageTexture;
 
         void Start()
         {
@@ -21,19 +21,19 @@ namespace AzureKinect4Unity
                 Debug.Log("ColorResolution: " + _KinectSensor.ColorImageWidth + "x" + _KinectSensor.ColorImageHeight);
                 Debug.Log("DepthResolution: " + _KinectSensor.DepthImageWidth + "x" + _KinectSensor.DepthImageHeight);
 
-                _TransformedColorImageTexture = new Texture2D(_KinectSensor.DepthImageWidth, _KinectSensor.DepthImageHeight, TextureFormat.BGRA32, false);
+                _ColorImageTexture = new Texture2D(_KinectSensor.ColorImageWidth, _KinectSensor.ColorImageHeight, TextureFormat.BGRA32, false);
 
                 _PointCloudRenderer = GetComponent<PointCloudRenderer>();
-                _PointCloudRenderer.GenerateMesh(_KinectSensor.DepthImageWidth, _KinectSensor.DepthImageHeight);
+                _PointCloudRenderer.GenerateMesh(_KinectSensor.ColorImageWidth, _KinectSensor.ColorImageHeight);
             }
         }
 
         void Update()
         {
-            if (_KinectSensor.TransformedColorImage != null)
+            if (_KinectSensor.RawColorImage != null)
             {
-                _TransformedColorImageTexture.LoadRawTextureData(_KinectSensor.TransformedColorImage);
-                _TransformedColorImageTexture.Apply();
+                _ColorImageTexture.LoadRawTextureData(_KinectSensor.RawColorImage);
+                _ColorImageTexture.Apply();
             }
 
             if (_KinectSensor.PointCloud != null)
@@ -47,7 +47,7 @@ namespace AzureKinect4Unity
                 }
 
                 _PointCloudRenderer.UpdateVertices(vertices);
-                _PointCloudRenderer.UpdateColorTexture(_KinectSensor.TransformedColorImage);
+                _PointCloudRenderer.UpdateColorTexture(_KinectSensor.RawColorImage);
             }
         }
     }
