@@ -8,6 +8,7 @@ namespace AzureKinect4Unity
 {
     public class AzureKinectSensor : MonoBehaviour
     {
+        public ImageFormat ColorImageFormat = ImageFormat.ColorBGRA32;
         public ColorCameraMode ColorCameraMode = ColorCameraMode._1920_x_1080_30fps;
         public DepthCameraMode DepthCameraMode = DepthCameraMode._512_x_512_30fps;
 
@@ -15,6 +16,8 @@ namespace AzureKinect4Unity
         public Device Device { get { return _KinectSensor; } }
 
         private Calibration _DeviceCalibration;
+        public Calibration DeviceCalibration { get { return _DeviceCalibration; } }
+
         private Transformation _Transformation;
         private bool _IsCameraStarted = false;
 
@@ -31,10 +34,10 @@ namespace AzureKinect4Unity
         public byte[] RawColorImage { get { return _RawColorImage; } }
         private byte[] _TransformedColorImage = null;
         public byte[] TransformedColorImage { get { return _TransformedColorImage; } }
-        private ushort[] _RawDepthImage = null;
-        public ushort[] RawDepthImage { get { return _RawDepthImage; } }
-        private ushort[] _TransformedDepthImage = null;
-        public ushort[] TransformedDepthImage { get { return _TransformedDepthImage; } }
+        private short[] _RawDepthImage = null;
+        public short[] RawDepthImage { get { return _RawDepthImage; } }
+        private short[] _TransformedDepthImage = null;
+        public short[] TransformedDepthImage { get { return _TransformedDepthImage; } }
 
         private Short3[] _PointCloud = null;
         public Short3[] PointCloud { get { return _PointCloud; } }
@@ -49,7 +52,7 @@ namespace AzureKinect4Unity
             }
 
             DeviceConfiguration kinectConfig = new DeviceConfiguration();
-            kinectConfig.ColorFormat = ImageFormat.ColorBGRA32;
+            kinectConfig.ColorFormat = ColorImageFormat;
             kinectConfig.ColorResolution = (ColorResolution) ColorCameraMode;
             kinectConfig.DepthMode = (DepthMode) DepthCameraMode;
 
@@ -107,8 +110,8 @@ namespace AzureKinect4Unity
                     Image depthImage = capture.Depth;
                     Image transformedDepthImage = _Transformation.DepthImageToColorCamera(capture);
 
-                    _RawDepthImage = depthImage.GetPixels<ushort>().ToArray();
-                    _TransformedDepthImage = transformedDepthImage.GetPixels<ushort>().ToArray();
+                    _RawDepthImage = depthImage.GetPixels<short>().ToArray();
+                    _TransformedDepthImage = transformedDepthImage.GetPixels<short>().ToArray();
 
                     _PointCloud = _Transformation.DepthImageToPointCloud(transformedDepthImage, CalibrationDeviceType.Color)
                                                  .GetPixels<Short3>().ToArray();
