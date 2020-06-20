@@ -5,6 +5,10 @@ SimpleVisualizer
 
 <img src="./Assets/AzureKinect4Unity/Images/AzureKinect4Unity_SimpleVisualizer.png" width="60%">
 
+OrientationEstimator  
+
+<img src="./Assets/AzureKinect4Unity/Images/AzureKinect4Unity_OrientationEstimator.jpg" width="60%">
+
 ## Tested environment
 - Unity 2018.4.21f1
 - Azure Kinect SDK 1.4.0

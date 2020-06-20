@@ -1,8 +1,13 @@
 # Azure Kinect for Unity
 
 ## Examples
-SimpleVisualizer  
+SimpleVisualizer
+
 <img src="./Images/AzureKinect4Unity_SimpleVisualizer.png" width="60%">
+
+OrientationEstimator
+
+<img src="./Images/AzureKinect4Unity_OrientationEstimator.jpg" width="60%">
 
 ## Tested environment
 - Unity 2018.4.21f1
