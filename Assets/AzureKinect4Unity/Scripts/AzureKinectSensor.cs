@@ -42,6 +42,9 @@ namespace AzureKinect4Unity
         private Short3[] _PointCloud = null;
         public Short3[] PointCloud { get { return _PointCloud; } }
 
+        private ImuSample _ImuSample = new ImuSample();
+        public ImuSample ImuSample => _ImuSample;
+
         public static int GetDeviceCount()
         {
             int deviceCount = Device.GetInstalledCount();
@@ -83,6 +86,8 @@ namespace AzureKinect4Unity
             _KinectSensor.StartCameras(kinectConfig);
             _IsCameraStarted = true;
 
+            _KinectSensor.StartImu();
+
             _DeviceCalibration = _KinectSensor.GetCalibration();
             _Transformation = _DeviceCalibration.CreateTransformation();
 
@@ -101,6 +106,8 @@ namespace AzureKinect4Unity
         {
             if (_KinectSensor != null)
             {
+                _KinectSensor.StopImu();
+
                 _IsCameraStarted = false;
                 _KinectSensor.StopCameras();
 
@@ -132,6 +139,8 @@ namespace AzureKinect4Unity
                     _PointCloud = _Transformation.DepthImageToPointCloud(transformedDepthImage, CalibrationDeviceType.Color)
                                                  .GetPixels<Short3>().ToArray();
                 }
+
+                _ImuSample = _KinectSensor.GetImuSample();
 
                 capture.Dispose();
             }
