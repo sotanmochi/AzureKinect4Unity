@@ -6,6 +6,7 @@ namespace AzureKinect4Unity
     public class AzureKinectSimpleVisualizer : MonoBehaviour
     {
         [SerializeField] AzureKinectManager _AzureKinectManager;
+        [SerializeField] int _DeviceNumber = 0;
         [SerializeField] Shader _DepthVisualizer;
         [SerializeField] Material _UnlitTextureMaterial;
         [SerializeField] GameObject _ColorImageObject;
@@ -15,75 +16,90 @@ namespace AzureKinect4Unity
 
         Texture2D _ColorImageTexture;
         Texture2D _TransformedColorImageTexture;
-        Texture2D _DepthImageTexture;
-        Texture2D _TransformedDepthImageTexture;
+
+        Material _DepthVisualizerMaterial;
+        Material _TransformedDepthVisualizerMaterial;
+        ComputeBuffer _DepthBuffer;
+        ComputeBuffer _TransformedDepthBuffer;
 
         AzureKinectSensor _KinectSensor;
-        byte[] _DepthRawData;
-        byte[] _TransformedDepthRawData;
 
         void Start()
         {
-            _KinectSensor = _AzureKinectManager.Sensor;
-            if (_KinectSensor != null)
+            var kinectSensors = _AzureKinectManager.SensorList;
+            if (_DeviceNumber < kinectSensors.Count)
             {
-                _DepthRawData = new byte[_KinectSensor.DepthImageWidth * _KinectSensor.DepthImageHeight * sizeof(ushort)];
-                _TransformedDepthRawData = new byte[_KinectSensor.ColorImageWidth * _KinectSensor.ColorImageHeight * sizeof(ushort)];
+                _KinectSensor = kinectSensors[_DeviceNumber];
+                if (_KinectSensor != null)
+                {
+                    _ColorImageTexture = new Texture2D(_KinectSensor.ColorImageWidth, _KinectSensor.ColorImageHeight, TextureFormat.BGRA32, false);
+                    _TransformedColorImageTexture = new Texture2D(_KinectSensor.DepthImageWidth, _KinectSensor.DepthImageHeight, TextureFormat.BGRA32, false);
 
-                _ColorImageTexture = new Texture2D(_KinectSensor.ColorImageWidth, _KinectSensor.ColorImageHeight, TextureFormat.BGRA32, false);
-                _TransformedColorImageTexture = new Texture2D(_KinectSensor.DepthImageWidth, _KinectSensor.DepthImageHeight, TextureFormat.BGRA32, false);
-                _DepthImageTexture = new Texture2D(_KinectSensor.DepthImageWidth, _KinectSensor.DepthImageHeight, TextureFormat.R16, false);
-                _TransformedDepthImageTexture = new Texture2D(_KinectSensor.ColorImageWidth, _KinectSensor.ColorImageHeight, TextureFormat.R16, false);
+                    int depthImageSize = _KinectSensor.DepthImageWidth * _KinectSensor.DepthImageHeight;
+                    int transformedDepthImageSize = _KinectSensor.ColorImageWidth * _KinectSensor.ColorImageHeight;
 
-                MeshRenderer colorMeshRenderer = _ColorImageObject.GetComponent<MeshRenderer>();
-                colorMeshRenderer.sharedMaterial = new Material(_UnlitTextureMaterial);
-                colorMeshRenderer.sharedMaterial.SetTexture("_MainTex", _ColorImageTexture);
+                    _DepthBuffer = new ComputeBuffer(depthImageSize / 2, sizeof(uint));
+                    _TransformedDepthBuffer = new ComputeBuffer(transformedDepthImageSize / 2, sizeof(uint));
 
-                MeshRenderer transformedColorMeshRenderer = _TransformedColorImageObject.GetComponent<MeshRenderer>();
-                transformedColorMeshRenderer.sharedMaterial = new Material(_UnlitTextureMaterial);
-                transformedColorMeshRenderer.sharedMaterial.SetTexture("_MainTex", _TransformedColorImageTexture);
+                    MeshRenderer colorMeshRenderer = _ColorImageObject.GetComponent<MeshRenderer>();
+                    colorMeshRenderer.sharedMaterial = new Material(_UnlitTextureMaterial);
+                    colorMeshRenderer.sharedMaterial.SetTexture("_MainTex", _ColorImageTexture);
 
-                MeshRenderer depthMeshRenderer = _DepthImageObject.GetComponent<MeshRenderer>();
-                depthMeshRenderer.sharedMaterial = new Material(_DepthVisualizer);
-                depthMeshRenderer.sharedMaterial.SetTexture("_DepthTex", _DepthImageTexture);
+                    MeshRenderer transformedColorMeshRenderer = _TransformedColorImageObject.GetComponent<MeshRenderer>();
+                    transformedColorMeshRenderer.sharedMaterial = new Material(_UnlitTextureMaterial);
+                    transformedColorMeshRenderer.sharedMaterial.SetTexture("_MainTex", _TransformedColorImageTexture);
 
-                MeshRenderer transformedDepthMeshRenderer = _TransformedDepthImageObject.GetComponent<MeshRenderer>();
-                transformedDepthMeshRenderer.sharedMaterial = new Material(_DepthVisualizer);
-                transformedDepthMeshRenderer.sharedMaterial.SetTexture("_DepthTex", _TransformedDepthImageTexture);
+                    _DepthVisualizerMaterial = new Material(_DepthVisualizer);
+                    _DepthVisualizerMaterial.SetInt("_Width", _KinectSensor.DepthImageWidth);
+                    _DepthVisualizerMaterial.SetInt("_Height", _KinectSensor.DepthImageHeight);
+                    MeshRenderer depthMeshRenderer = _DepthImageObject.GetComponent<MeshRenderer>();
+                    depthMeshRenderer.sharedMaterial = _DepthVisualizerMaterial;
+
+                    _TransformedDepthVisualizerMaterial = new Material(_DepthVisualizer);
+                    _TransformedDepthVisualizerMaterial.SetInt("_Width", _KinectSensor.ColorImageWidth);
+                    _TransformedDepthVisualizerMaterial.SetInt("_Height", _KinectSensor.ColorImageHeight);
+                    MeshRenderer transformedDepthMeshRenderer = _TransformedDepthImageObject.GetComponent<MeshRenderer>();
+                    transformedDepthMeshRenderer.sharedMaterial = _TransformedDepthVisualizerMaterial;
+                }
+
+                Debug.Log("ColorResolution: " + _KinectSensor.ColorImageWidth + "x" + _KinectSensor.ColorImageHeight);
+                Debug.Log("DepthResolution: " + _KinectSensor.DepthImageWidth + "x" + _KinectSensor.DepthImageHeight);
             }
+        }
 
-            Debug.Log("ColorResolution: " + _KinectSensor.ColorImageWidth + "x" + _KinectSensor.ColorImageHeight);
-            Debug.Log("DepthResolution: " + _KinectSensor.DepthImageWidth + "x" + _KinectSensor.DepthImageHeight);
+        void OnDestroy()
+        {
+            _DepthBuffer?.Dispose();
+            _TransformedDepthBuffer?.Dispose();
         }
 
         void Update()
         {
-            if (_KinectSensor.RawColorImage != null)
+            if (_KinectSensor != null)
             {
-                _ColorImageTexture.LoadRawTextureData(_KinectSensor.RawColorImage);
-                _ColorImageTexture.Apply();
-            }
+                if (_KinectSensor.RawColorImage != null)
+                {
+                    _ColorImageTexture.LoadRawTextureData(_KinectSensor.RawColorImage);
+                    _ColorImageTexture.Apply();
+                }
 
-            if (_KinectSensor.TransformedColorImage != null)
-            {
-                _TransformedColorImageTexture.LoadRawTextureData(_KinectSensor.TransformedColorImage);
-                _TransformedColorImageTexture.Apply();
-            }
+                if (_KinectSensor.TransformedColorImage != null)
+                {
+                    _TransformedColorImageTexture.LoadRawTextureData(_KinectSensor.TransformedColorImage);
+                    _TransformedColorImageTexture.Apply();
+                }
 
-            if (_KinectSensor.RawDepthImage != null)
-            {
-                short[] depthImage = _KinectSensor.RawDepthImage;
-                Buffer.BlockCopy(depthImage, 0, _DepthRawData, 0, _DepthRawData.Length);
-                _DepthImageTexture.LoadRawTextureData(_DepthRawData);
-                _DepthImageTexture.Apply();
-            }
+                if (_KinectSensor.RawDepthImage != null)
+                {
+                    _DepthBuffer.SetData(_KinectSensor.RawDepthImage);
+                    _DepthVisualizerMaterial.SetBuffer("_DepthBuffer", _DepthBuffer);
+                }
 
-            if (_KinectSensor.TransformedDepthImage != null)
-            {
-                short[] depthImage = _KinectSensor.TransformedDepthImage;
-                Buffer.BlockCopy(depthImage, 0, _TransformedDepthRawData, 0, _TransformedDepthRawData.Length);
-                _TransformedDepthImageTexture.LoadRawTextureData(_TransformedDepthRawData);
-                _TransformedDepthImageTexture.Apply();
+                if (_KinectSensor.TransformedDepthImage != null)
+                {
+                    _TransformedDepthBuffer.SetData(_KinectSensor.TransformedDepthImage);
+                    _TransformedDepthVisualizerMaterial.SetBuffer("_DepthBuffer", _TransformedDepthBuffer);
+                }
             }
         }
     }
