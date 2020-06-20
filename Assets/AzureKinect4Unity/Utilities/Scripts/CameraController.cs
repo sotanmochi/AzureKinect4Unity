@@ -9,6 +9,10 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+	[SerializeField] float _TrackSpeed = 2.0f;
+	[SerializeField] float _MoveSpeed = 0.5f;
+	[SerializeField] float _RotateSpeed = 2.0f;
+
 	public enum MouseButtonType
 	{
 		Left,
@@ -41,7 +45,7 @@ public class CameraController : MonoBehaviour
 	private void Track()
 	{
 		float scroll = Input.GetAxis("Mouse ScrollWheel");
-		transform.position += transform.forward * 2.0f * scroll; 
+		transform.position += transform.forward * _TrackSpeed * scroll; 
 	}
 
 	private void Rotate()
@@ -49,14 +53,14 @@ public class CameraController : MonoBehaviour
 		Vector2 angle = Vector2.zero;
 		angle.x = Input.GetAxis("Mouse X");
 		angle.y = Input.GetAxis("Mouse Y");
-    	transform.RotateAround(transform.position, Vector3.up, 2.0f * angle.x);
-		transform.RotateAround(transform.position, transform.right, -2.0f * angle.y);
+    	transform.RotateAround(transform.position, Vector3.up, _RotateSpeed * angle.x);
+		transform.RotateAround(transform.position, transform.right, -_RotateSpeed * angle.y);
 	}
 
 	private void Move()
 	{
-		Vector3 horizontal = transform.right * (-Input.GetAxis("Mouse X")) * 0.5f;
-		Vector3 vertical = transform.up * (-Input.GetAxis("Mouse Y")) * 0.5f;
+		Vector3 horizontal = transform.right * (-Input.GetAxis("Mouse X")) * _MoveSpeed;
+		Vector3 vertical = transform.up * (-Input.GetAxis("Mouse Y")) * _MoveSpeed;
 		transform.position += (horizontal + vertical);
 	}
 
