@@ -9,9 +9,10 @@ namespace AzureKinect4Unity
     {
         [SerializeField] AzureKinectManager _AzureKinectManager;
         [SerializeField] int _DeviceNumber = 0;
+        [SerializeField] bool LowPassFilter = true;
 
         AzureKinectSensor _KinectSensor;
-        ExponentialSmoothingLowPassFilter _LowPassFilter;
+        LowPassFilter _LowPassFilter;
         float [] _Accel = new float[3];
         float [] _AccelOut = new float[3];
 
@@ -29,7 +30,8 @@ namespace AzureKinect4Unity
                     Debug.Log("ColorResolution: " + _KinectSensor.ColorImageWidth + "x" + _KinectSensor.ColorImageHeight);
                     Debug.Log("DepthResolution: " + _KinectSensor.DepthImageWidth + "x" + _KinectSensor.DepthImageHeight);
 
-                    _LowPassFilter = new ExponentialSmoothingLowPassFilter((uint)_Accel.Length, 0.05f);
+                    // _LowPassFilter = new ExponentialSmoothingLowPassFilter((uint)_Accel.Length, 0.05f);
+                    _LowPassFilter = new DoubleExponentialSmoothingLowPassFilter((uint)_Accel.Length, 0.3f, 0.3f);
 
                     _ColorImageTexture = new Texture2D(_KinectSensor.ColorImageWidth, _KinectSensor.ColorImageHeight, TextureFormat.BGRA32, false);
 
@@ -65,13 +67,16 @@ namespace AzureKinect4Unity
                 }
 
                 System.Numerics.Vector3 accel = _KinectSensor.ImuSample.AccelerometerSample;
-                _Accel[0] = accel.X;
-                _Accel[1] = accel.Y;
-                _Accel[2] = accel.Z;
-                _LowPassFilter.Apply(_Accel, ref _AccelOut);
-                accel.X = _AccelOut[0];
-                accel.Y = _AccelOut[1];
-                accel.Z = _AccelOut[2];
+                if (LowPassFilter)
+                {
+                    _Accel[0] = accel.X;
+                    _Accel[1] = accel.Y;
+                    _Accel[2] = accel.Z;
+                    _LowPassFilter.Apply(_Accel, ref _AccelOut);
+                    accel.X = _AccelOut[0];
+                    accel.Y = _AccelOut[1];
+                    accel.Z = _AccelOut[2];
+                }
 
                 UnityEngine.Vector3 kinectOrientation = OrientationEstimator.EstimateFromAccelerometerForUnity(accel);
 
