@@ -396,6 +396,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _AzureKinectManager: {fileID: 858880385}
   _DeviceNumber: 0
+  LowPassFilter: 1
+  _Order: 3
+  _CutoffFrequency: 1
+  _SamplingFrequency: 60
 --- !u!114 &1646135971
 MonoBehaviour:
   m_ObjectHideFlags: 0

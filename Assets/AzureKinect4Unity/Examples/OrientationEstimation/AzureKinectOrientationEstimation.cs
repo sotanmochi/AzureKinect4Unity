@@ -11,8 +11,12 @@ namespace AzureKinect4Unity
         [SerializeField] int _DeviceNumber = 0;
         [SerializeField] bool LowPassFilter = true;
 
+        [SerializeField] uint _Order = 3;
+        [SerializeField] float _CutoffFrequency = 1; // [Hz]
+        [SerializeField] float _SamplingFrequency = 60; // [Hz]
+
         AzureKinectSensor _KinectSensor;
-        LowPassFilter _LowPassFilter;
+        ILowPassFilter _LowPassFilter;
         float [] _Accel = new float[3];
         float [] _AccelOut = new float[3];
 
@@ -31,7 +35,8 @@ namespace AzureKinect4Unity
                     Debug.Log("DepthResolution: " + _KinectSensor.DepthImageWidth + "x" + _KinectSensor.DepthImageHeight);
 
                     // _LowPassFilter = new ExponentialSmoothingLowPassFilter((uint)_Accel.Length, 0.05f);
-                    _LowPassFilter = new DoubleExponentialSmoothingLowPassFilter((uint)_Accel.Length, 0.3f, 0.3f);
+                    // _LowPassFilter = new DoubleExponentialSmoothingLowPassFilter((uint)_Accel.Length, 0.3f, 0.3f);
+                    _LowPassFilter = new ButterworthFilter(_Order, _SamplingFrequency, _CutoffFrequency, (uint)_Accel.Length);
 
                     _ColorImageTexture = new Texture2D(_KinectSensor.ColorImageWidth, _KinectSensor.ColorImageHeight, TextureFormat.BGRA32, false);
 

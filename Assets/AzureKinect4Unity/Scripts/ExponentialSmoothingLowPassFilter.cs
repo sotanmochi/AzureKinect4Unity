@@ -3,7 +3,7 @@
 
 namespace AzureKinect4Unity
 {
-    public class ExponentialSmoothingLowPassFilter : LowPassFilter
+    public class ExponentialSmoothingLowPassFilter : ILowPassFilter
     {
         float[] _LastOutput;
         float _Weight;
@@ -32,7 +32,7 @@ namespace AzureKinect4Unity
         }
     }
 
-    public class DoubleExponentialSmoothingLowPassFilter : LowPassFilter
+    public class DoubleExponentialSmoothingLowPassFilter : ILowPassFilter
     {
         float[] _SmoothedValue;
         float[] _Trend;

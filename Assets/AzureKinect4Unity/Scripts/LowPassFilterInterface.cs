@@ -3,7 +3,7 @@
 
 namespace AzureKinect4Unity
 {
-    public interface LowPassFilter
+    public interface ILowPassFilter
     {
         bool Apply(in float[] input, ref float[] output);
     }
