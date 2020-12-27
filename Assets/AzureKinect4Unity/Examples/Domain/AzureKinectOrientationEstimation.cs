@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Microsoft.Azure.Kinect.Sensor;
 
 namespace AzureKinect4Unity
@@ -23,12 +22,14 @@ namespace AzureKinect4Unity
         PointCloudMesh _PointCloudMesh;
         Texture2D _ColorImageTexture;
 
-        void Start()
+        public bool Initialized => _Initialized;
+        private bool _Initialized;
+
+        public void Initialize(AzureKinectSensor kinectSensor)
         {
-            List<AzureKinectSensor> kinectSensors = _AzureKinectManager.SensorList;
-            if (_DeviceNumber < kinectSensors.Count)
+            if (!_Initialized)
             {
-                _KinectSensor = _AzureKinectManager.SensorList[_DeviceNumber];
+                _KinectSensor = kinectSensor;
                 if (_KinectSensor != null)
                 {
                     Debug.Log("ColorResolution: " + _KinectSensor.ColorImageWidth + "x" + _KinectSensor.ColorImageHeight);
@@ -42,13 +43,14 @@ namespace AzureKinect4Unity
 
                     _PointCloudMesh = GetComponent<PointCloudMesh>();
                     _PointCloudMesh.GenerateMesh(_KinectSensor.ColorImageWidth, _KinectSensor.ColorImageHeight);
+
+                    _Initialized = true;
                 }
             }
         }
 
         void Update()
         {
-            _KinectSensor = _AzureKinectManager.SensorList[_DeviceNumber];
             if (_KinectSensor != null)
             {
                 if (_KinectSensor.RawColorImage != null)
