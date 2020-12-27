@@ -61,10 +61,16 @@ namespace AzureKinect4Unity
 
         public bool OpenSensor(int deviceIndex = 0)
         {
+           if (_KinectSensor != null)
+            {
+                Debug.Log("AzureKinect [" + _KinectSensor.SerialNum + "] has already been opened.");
+                return false;
+            }
+
             _KinectSensor = Device.Open(deviceIndex);
             if (_KinectSensor == null)
             {
-                Debug.LogError("AzureKinect cannot be opened.");
+                Debug.Log("AzureKinect cannot be opened.");
                 return false;
             }
 
@@ -106,6 +112,8 @@ namespace AzureKinect4Unity
         {
             if (_KinectSensor != null)
             {
+                Debug.Log("AzureKinect [" + _KinectSensor.SerialNum + "] has closed.");
+
                 _KinectSensor.StopImu();
 
                 _IsCameraStarted = false;
