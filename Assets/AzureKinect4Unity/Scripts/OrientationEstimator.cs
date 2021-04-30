@@ -30,7 +30,7 @@ namespace AzureKinect4Unity
             float ayz = (float) Math.Sqrt(accelerometer.Y * accelerometer.Y + accelerometer.Z * accelerometer.Z);
 
             float roll = (float) Math.Atan2(accelerometer.Y, accelerometer.Z);
-            float pitch = (float) Math.Atan2(accelerometer.X, ayz);
+            float pitch = (float) -Math.Atan2(accelerometer.X, ayz);
 
             estimatedAngles.X = (float)(roll * 180.0 / Math.PI);
             estimatedAngles.Y = (float)(pitch * 180.0 / Math.PI);
