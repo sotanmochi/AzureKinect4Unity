@@ -144,7 +144,7 @@ namespace AzureKinect4Unity
                     _RawDepthImage = depthImage.GetPixels<short>().ToArray();
                     _TransformedDepthImage = transformedDepthImage.GetPixels<short>().ToArray();
 
-                    _PointCloud = _Transformation.DepthImageToPointCloud(transformedDepthImage, CalibrationDeviceType.Color)
+                    _PointCloud = _Transformation.DepthImageToPointCloud(depthImage)
                                                  .GetPixels<Short3>().ToArray();
                 }
 
