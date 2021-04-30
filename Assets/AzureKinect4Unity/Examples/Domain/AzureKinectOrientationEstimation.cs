@@ -122,7 +122,7 @@ namespace AzureKinect4Unity
                     accel.Z = _AccelOut[2];
                 }
 
-                UnityEngine.Vector3 kinectOrientation = OrientationEstimator.EstimateFromAccelerometerForUnity(accel);
+                UnityEngine.Vector3 kinectOrientation = OrientationEstimator.EstimateForAzureKinect(accel);
 
                 this.transform.eulerAngles = kinectOrientation;
             }
