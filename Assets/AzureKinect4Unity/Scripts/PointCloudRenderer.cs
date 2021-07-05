@@ -48,7 +48,7 @@ namespace AzureKinect4Unity
                     width = calibration.DepthCameraCalibration.resolutionWidth;
                     height = calibration.DepthCameraCalibration.resolutionHeight;
 
-                    extrinsics = calibration.ColorCameraCalibration.extrinsics;
+                    extrinsics = calibration.DepthCameraCalibration.extrinsics;
                     extrinsics.translation[0] /= 1000.0f; // [millimeters] -> [meters]
                     extrinsics.translation[1] /= 1000.0f; // [millimeters] -> [meters]
                     extrinsics.translation[2] /= 1000.0f; // [millimeters] -> [meters]
@@ -58,7 +58,7 @@ namespace AzureKinect4Unity
                     width = calibration.ColorCameraCalibration.resolutionWidth;
                     height = calibration.ColorCameraCalibration.resolutionHeight;
 
-                    extrinsics = calibration.DepthCameraCalibration.extrinsics;
+                    extrinsics = calibration.ColorCameraCalibration.extrinsics;
 
                     break;
                 default:
